@@ -35,6 +35,11 @@ services:
     image: "job-service"
   config:
     build: ../../config-server
+    command: --spring.profiles.active=native --spring.cloud.config.server.native.searchLocations=/config
+    volumes:
+      - type: bind
+        source: ./src/main/resources/centralRepo
+        target: /config
     environment: 
       - eureka.client.serviceUrl.defaultZone=http://discovery:8761/eureka/
     ports:
