@@ -5,6 +5,14 @@ services:
     ports:
       - "8761:8761"
     image: "discovery-server"
+  job_A:
+    build: ../../job-MS
+    environment: 
+      - eureka.client.serviceUrl.defaultZone=http://discovery:8761/eureka/
+      - spring.cloud.config.uri=http://config:8888
+    ports:
+      - "8182:8180"
+    image: "job-service"
   candidate_B:
     build:  ../../candidateMS
     environment: 
@@ -25,14 +33,6 @@ services:
     image: "candidate-service"
     depends_on:
       - job_A
-  job_A:
-    build: ../../job-MS
-    environment: 
-      - eureka.client.serviceUrl.defaultZone=http://discovery:8761/eureka/
-      - spring.cloud.config.uri=http://config:8888
-    ports:
-      - "8180:8180"
-    image: "job-service"
   config:
     build: ../../config-server
     command: --spring.profiles.active=native --spring.cloud.config.server.native.searchLocations=/config
@@ -42,6 +42,14 @@ services:
         target: /config
     environment: 
       - eureka.client.serviceUrl.defaultZone=http://discovery:8761/eureka/
+      - spring.profiles.active=native
     ports:
       - "8888:8888"
     image: "config-server"
+  gateway:
+    build: ../../zuul-server
+    environment: 
+      - eureka.client.serviceUrl.defaultZone=http://discovery:8761/eureka/
+    ports:
+      - "8762:8762"
+    image: "gateway-server"
